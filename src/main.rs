@@ -34,7 +34,7 @@ struct Args {
     target: Target,
 
     /// Protection profile (metadata only in this prototype)
-    #[arg(short, long, value_enum, default_value_t = Level::Standard)]
+    #[arg(short, long, value_enum, default_value = "standard")]
     level: Level,
 }
 
