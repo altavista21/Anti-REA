@@ -12,7 +12,7 @@ pub fn encrypt(plaintext: &[u8], key: &[u8]) -> Result<Vec<u8>> {
         bail!("AES-256-GCM requires a 32-byte key.");
     }
 
-    let cipher = Aes256Gcm::new_from_slice(key)?;
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| anyhow::anyhow!("Invalid AES-256 key length."))?;
     let mut nonce_bytes = [0u8; NONCE_LEN];
     OsRng.fill_bytes(&mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes);
@@ -42,7 +42,7 @@ pub fn decrypt(envelope: &[u8], key: &[u8]) -> Result<Vec<u8>> {
     let nonce_start = MAGIC.len();
     let nonce_end = nonce_start + NONCE_LEN;
     let nonce = Nonce::from_slice(&envelope[nonce_start..nonce_end]);
-    let cipher = Aes256Gcm::new_from_slice(key)?;
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| anyhow::anyhow!("Invalid AES-256 key length."))?;
     cipher
         .decrypt(nonce, &envelope[nonce_end..])
         .map_err(|_| anyhow::anyhow!("Decryption failed: wrong key or file integrity check failed."))
