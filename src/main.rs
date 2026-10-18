@@ -29,6 +29,10 @@ struct Args {
     #[arg(short, long)]
     output: PathBuf,
 
+    /// Overwrite the output file if it already exists
+    #[arg(short = 'f', long)]
+    force: bool,
+
     /// Intended target platform (metadata only in this prototype)
     #[arg(short, long, value_enum)]
     target: Target,
@@ -44,8 +48,8 @@ fn main() -> Result<()> {
     if args.input == args.output {
         bail!("Input and output paths must be different.");
     }
-    if args.output.exists() {
-        bail!("Output already exists; refusing to overwrite it.");
+    if args.output.exists() && !args.force {
+        bail!("Output already exists; use --force (-f) to overwrite it.");
     }
 
     let key_hex = std::env::var("AEGISFORGE_KEY_HEX")
